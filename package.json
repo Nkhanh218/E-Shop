@@ -13,7 +13,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@reduxjs/toolkit": "^2.2.7",
+    "axios": "^1.7.4",
     "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.4.0",
+    "cloudinary-build-url": "^0.2.4",
     "concurrently": "^8.2.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
