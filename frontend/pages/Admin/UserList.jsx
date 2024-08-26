@@ -6,13 +6,16 @@ import {
 import Loader from "../../component/Loader";
 import Message from "../../component/Message";
 import { Space, Table, Tag, Button, Popconfirm } from "antd";
-
+import { useOutletContext } from "react-router-dom";
+import "./custom.css";
 const UserList = () => {
   const { data: users, refetch, isLoading, error } = useGetUsersQuery();
   const [deleteUser] = useDeleteUserMutation();
-  const [editableUserId, setEditableUserId] = useState(null);
-  const [editableUserName, setEditableUserName] = useState("");
-  const [editableUserEmail, setEditableUserEmail] = useState("");
+  const { setHeaderTitle } = useOutletContext();
+
+  useEffect(() => {
+    setHeaderTitle("Quản lý người dùng");
+  }, [setHeaderTitle]);
   console.log(users);
 
   const confirm = async (id) => {
@@ -50,11 +53,6 @@ const UserList = () => {
       title: "Vai Trò",
       key: "isAdmin",
       dataIndex: "isAdmin",
-      // render: (isAdmin) => (
-      //   <Tag color={isAdmin ? "red" : "geekblue"}>
-      //     {isAdmin ? "Admin" : "Người dùng"}
-      //   </Tag>
-      // ),
     },
     {
       title: "Action",
@@ -99,21 +97,25 @@ const UserList = () => {
   }, [refetch]);
 
   return (
-    <div className="pt-32 pl-32">
-      <p className="py-10 text-xl font-semibold text-gray-500 ">
-        Danh Sách Người Dùng
-      </p>
-      {isLoading ? (
-        <Loader />
-      ) : error ? (
-        <Message variant="danger">
-          {error?.data.message || error.message}
-        </Message>
-      ) : (
-        <div className="flex flex-col md:flex-row">
-          <Table columns={columns} dataSource={data} rowKey="_id" />
-        </div>
-      )}
+    <div className=" flex justify-center items-center  ">
+      <div className="bg-white p-8 rounded-3xl shadow-lg max-w-6xl w-full">
+        {isLoading ? (
+          <Loader />
+        ) : error ? (
+          <Message variant="danger">
+            {error?.data.message || error.message}
+          </Message>
+        ) : (
+          <div className="flex flex-col items-center justify-center md:flex-row w-full">
+            <Table
+              className="custom-table"
+              columns={columns}
+              dataSource={data}
+              rowKey="_id"
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

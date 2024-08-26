@@ -9,9 +9,10 @@ import { toast } from "react-toastify";
 import ModalCat from "../../component/Modal";
 import CategoryForm from "./../../component/CategoryForm";
 import axios from "axios";
+import Loader from "../../component/Loader";
 
 const CategoryList = () => {
-  const { data: categories } = useFetchCategoriesQuery();
+  const { data: categories, refetch } = useFetchCategoriesQuery();
   const [name, setName] = useState("");
   const [image, setImage] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -48,7 +49,6 @@ const CategoryList = () => {
     if (!name) {
       toast.error("Tên thể loại không được để trống");
       setIsLoading(false);
-
       return;
     }
 
@@ -56,13 +56,13 @@ const CategoryList = () => {
 
     try {
       const result = await createCategory({ name, image: imageUrl }).unwrap();
-
       if (result.error) {
         toast.error(result.error);
       } else {
         setName("");
         setImage(null);
         toast.success(`${result.name} đã được tạo.`);
+        refetch(); // Refetch categories to update the list
       }
     } catch (error) {
       console.error(error);
@@ -78,16 +78,14 @@ const CategoryList = () => {
 
     if (!updatingName) {
       toast.error("Tên thể loại không được để trống");
+      setIsLoading(false);
       return;
     }
 
     let imageUrl = selectedCategory.image.url;
 
     if (image) {
-      imageUrl = await uploadImageToCloudinary(
-        image,
-        `category_${selectedCategory._id}`
-      );
+      imageUrl = await uploadImageToCloudinary(image);
     }
 
     try {
@@ -100,7 +98,7 @@ const CategoryList = () => {
         toast.error(result.error);
       } else {
         toast.success(`${result.name} đã được cập nhật!`);
-
+        refetch(); // Refetch categories to update the list
         setSelectedCategory(null);
         setUpdatingName("");
         setModalVisible(false);
@@ -119,39 +117,37 @@ const CategoryList = () => {
     try {
       const result = await deleteCategory(selectedCategory._id).unwrap();
 
-      console.log("result", result);
       if (result.error) {
         toast.error(result.error);
       } else {
         toast.success(`${result.name} đã được xoá.`);
-
+        refetch(); // Refetch categories to update the list
         setSelectedCategory(null);
         setModalVisible(false);
       }
     } catch (error) {
       console.error(error);
-      toast.error("Xoá thất bại hãy thử lại");
+      toast.error("Xoá thất bại, hãy thử lại");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="ml-[10rem] flex flex-col md:flex-row pt-32">
-      <div className="md:w-3/4 p-3">
-        <div className="h-12 text-xl font-semibold mb-4">Quản Lý Thể Loại</div>
+    <div className="flex justify-center items-center    ">
+      <div className="bg-white p-8 rounded-3xl shadow-lg max-w-6xl w-full">
         <CategoryForm
           value={name}
           setValue={setName}
           setImage={setImage}
-          isLoading={isLoading} // Pass loading state here
+          isLoading={isLoading}
           handleSubmit={handleCreateCategory}
         />
         <br />
         <hr />
-        <div className="flex flex-wrap">
+        <div className="flex flex-wrap mt-6">
           {categories?.map((category) => (
-            <div key={category._id} className="m-2">
+            <div key={category._id} className="mr-3 mb-3">
               <button
                 onClick={() => {
                   setModalVisible(true);
@@ -159,12 +155,12 @@ const CategoryList = () => {
                   setUpdatingName(category.name);
                 }}
               >
-                <div className="w-32 bg-white pt-4 shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition-shadow duration-300 border-2 border-gray-200 hover:border-blue-500">
-                  <div className="w-16 h-16 mx-auto rounded-full overflow-hidden border-2 border-gray-200">
+                <div className="w-32 bg-white pt-4 overflow-hidden cursor-pointer hover:shadow-xl transition-shadow duration-300 border-none hover:border-blue-500">
+                  <div className="w-16 h-16 mx-auto rounded-full overflow-hidden">
                     <img
                       src={category?.image?.url}
                       alt={category.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   </div>
                   <div className="p-2 h-14 text-center">
@@ -181,7 +177,7 @@ const CategoryList = () => {
           <CategoryForm
             value={updatingName}
             setValue={setUpdatingName}
-            setImage={setImage} // Correctly passing setImage prop here
+            setImage={setImage}
             handleSubmit={handleUpdateCategory}
             buttonText="Cập nhật"
             handleDelete={handleDeleteCategory}

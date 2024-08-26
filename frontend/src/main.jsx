@@ -13,6 +13,9 @@ import PrivateRouter from "./../component/PrivateRouter";
 import AdminRoute from "../pages/Admin/AdminRoute.jsx";
 import UserList from "../pages/Admin/UserList.jsx";
 import CategoryList from "../pages/Admin/CategoryList.jsx";
+import ProductList from "../pages/Admin/ProductList.jsx";
+import AllProducts from "../pages/Admin/AllProducts.jsx";
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
@@ -23,9 +26,12 @@ const router = createBrowserRouter(
       <Route path="/dang-ky" element={<Register />} />
 
       {/* Admin Route */}
+
       <Route path="/admin" element={<AdminRoute />}>
         <Route path="ds-nguoi-dung" element={<UserList />} />
         <Route path="ds-the-loai" element={<CategoryList />} />
+        <Route path="them-san-pham" element={<ProductList />} />
+        <Route path="tat-ca-san-pham" element={<AllProducts />} />
       </Route>
     </Route>
   )

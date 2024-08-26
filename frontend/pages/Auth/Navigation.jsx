@@ -7,19 +7,14 @@ import { logout } from "../../redux/features/auth/authSlice";
 
 import {
   BellOutlined,
-  DashboardOutlined,
   DownOutlined,
   FacebookFilled,
   GlobalOutlined,
   HeartOutlined,
   InstagramFilled,
-  LogoutOutlined,
   MenuOutlined,
-  ProductOutlined,
   QuestionCircleOutlined,
   ShoppingCartOutlined,
-  ShoppingOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -124,147 +119,143 @@ const Navigation = () => {
     },
   ];
 
-  return (
-    <div className="bg-[#4a90e2] shadow-lg fixed top-0 w-full z-10">
-      <div className="flex flex-col">
-        <div className="flex justify-around items-center p-2 ">
-          <div className="flex ">
-            <Link
-              to="/connect"
-              className="px-2 text-base text-white hidden md:block cursor-pointer"
-            >
-              Kết Nối <FacebookFilled className="text-lg" />{" "}
-              <InstagramFilled className="text-lg" />
-            </Link>
-          </div>
-          <div className="flex ">
-            <Link
-              to="/notifications"
-              className="px-2 text-base text-white hidden sm:block cursor-pointer"
-            >
-              <BellOutlined /> Thông Báo
-            </Link>
-            <Link
-              to="/support"
-              className="px-2 text-base text-white hidden sm:block cursor-pointer"
-            >
-              <QuestionCircleOutlined /> Hỗ Trợ
-            </Link>
-            <Link
-              to="/language"
-              className="px-2 text-base text-white cursor-pointer"
-            >
-              <GlobalOutlined /> Tiếng Việt
-            </Link>
+  if (userInfo?.isAdmin === false) {
+    return (
+      <div className="bg-[#4a90e2] shadow-lg fixed top-0 w-full z-10">
+        <div className="flex flex-col">
+          <div className="flex justify-around items-center p-2 ">
+            <div className="flex ">
+              <Link
+                to="/connect"
+                className="px-2 text-base text-white hidden md:block cursor-pointer"
+              >
+                Kết Nối <FacebookFilled className="text-lg" />{" "}
+                <InstagramFilled className="text-lg" />
+              </Link>
+            </div>
+            <div className="flex ">
+              <Link
+                to="/notifications"
+                className="px-2 text-base text-white hidden sm:block cursor-pointer"
+              >
+                <BellOutlined /> Thông Báo
+              </Link>
+              <Link
+                to="/support"
+                className="px-2 text-base text-white hidden sm:block cursor-pointer"
+              >
+                <QuestionCircleOutlined /> Hỗ Trợ
+              </Link>
+              <Link
+                to="/language"
+                className="px-2 text-base text-white cursor-pointer"
+              >
+                <GlobalOutlined /> Tiếng Việt
+              </Link>
 
-            {userInfo ? (
-              <>
-                <Link to="/profile" className="px-2 w-10 cursor-pointer">
-                  <img
-                    className="rounded-full w-6 h-6"
-                    // src={user.avatar.url}
-                    alt=""
-                  />
-                </Link>
-                <Dropdown
-                  menu={{ items: userInfo.isAdmin ? adminItems : userItems }}
-                  trigger={["click"]}
-                >
-                  <a
-                    className="text-base text-white cursor-pointer"
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    {userInfo.username} <DownOutlined />
-                  </a>
-                </Dropdown>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/dang-ky"
-                  className="px-2 text-base text-white cursor-pointer"
-                >
-                  Đăng Ký
-                </Link>
-                <Link
-                  to="/dang-nhap"
-                  className="px-2 text-base text-white cursor-pointer"
-                >
-                  Đăng Nhập
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-        <hr />
-        <div className="flex justify-around items-center p-4">
-          <Link to="/">
-            <img
-              className="h-16 md:h-12 hidden sm:block"
-              src="C:/Users/Admin/Desktop/DATN/uploads/logo.png"
-              alt="Logo"
-            />
-          </Link>
-          <div ref={searchContainerRef} className="relative">
-            <MenuOutlined
-              className="text-2xl sm:hidden px-4 cursor-pointer"
-              onClick={() => setOpenmenu(true)}
-            />
-            <Search
-              className="w-[250px] sm:w-[400px] md:w-[600px]"
-              onChange={handleSearchChange}
-              placeholder="Nhập từ khoá cần tìm"
-              // value={searchTerm}
-            />
-            {/* {searchData && searchData.length !== 0 && (
-              <div className="absolute bg-white border border-gray-300 w-full max-h-80 overflow-y-auto mt-2 z-50">
-                {searchData.map((i, index) => (
-                  <Link to={`/product/${i._id}`} key={index}>
-                    <div className="flex items-center border-b border-gray-200 p-2 hover:bg-gray-100 cursor-pointer">
-                      <img className="h-12 w-12 mr-2" />
-                      <h1 className="text-base m-0"></h1>
-                    </div>
+              {userInfo ? (
+                <>
+                  <Link to="/profile" className="px-2 w-10 cursor-pointer">
+                    <img
+                      className="rounded-full w-6 h-6"
+                      // src={user.avatar.url}
+                      alt=""
+                    />
                   </Link>
-                ))}
-              </div>
-            )} */}
+                  <Dropdown
+                    menu={{
+                      items: userInfo.isAdmin ? adminItems : userItems,
+                    }}
+                    trigger={["click"]}
+                  >
+                    <a
+                      className="text-base text-white cursor-pointer"
+                      onClick={(e) => e.preventDefault()}
+                    >
+                      {userInfo.username} <DownOutlined />
+                    </a>
+                  </Dropdown>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/dang-ky"
+                    className="px-2 text-base text-white cursor-pointer"
+                  >
+                    Đăng Ký
+                  </Link>
+                  <Link
+                    to="/dang-nhap"
+                    className="px-2 text-base text-white cursor-pointer"
+                  >
+                    Đăng Nhập
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
-          <div className="md:flex justify-between items-center space-x-4">
-            <HeartOutlined
-              className="hidden md:flex text-2xl text-white cursor-pointer"
-              title="Wish List"
-            />
-            <Link to="/cart">
-              <ShoppingCartOutlined
-                className="text-2xl text-white cursor-pointer"
-                title="Product Cart"
+          <hr />
+
+          <div className="flex justify-around items-center p-4">
+            <Link to="/">
+              <img
+                className="h-16 md:h-12 hidden sm:block"
+                src="C:/Users/Admin/Desktop/DATN/uploads/logo.png"
+                alt="Logo"
               />
             </Link>
+            <div ref={searchContainerRef} className="relative">
+              <MenuOutlined
+                className="text-2xl sm:hidden px-4 cursor-pointer"
+                onClick={() => setOpenmenu(true)}
+              />
+              <Search
+                className="w-[250px] sm:w-[400px] md:w-[600px]"
+                onChange={handleSearchChange}
+                placeholder="Nhập từ khoá cần tìm"
+                // value={searchTerm}
+              />
+            </div>
+            <div className="md:flex justify-between items-center space-x-4">
+              <HeartOutlined
+                className="hidden md:flex text-2xl text-white cursor-pointer"
+                title="Wish List"
+              />
+              <Link to="/cart">
+                <ShoppingCartOutlined
+                  className="text-2xl text-white cursor-pointer"
+                  title="Product Cart"
+                />
+              </Link>
+            </div>
           </div>
+
+          <Drawer
+            title="Menu"
+            width={250}
+            placement="left"
+            open={openMenu}
+            onClose={() => setOpenmenu(false)}
+            closable={false}
+          >
+            {/* <Navbar isInline /> */}
+          </Drawer>
+          <hr />
+          {/* <div className="flex justify-between items-center p-4">
+            <DropDown
+              categoriesData={categoriesData}
+              className="w-1/4 md:w-1/6"
+            />
+            <div className="hidden md:block">
+              <Navbar />
+            </div>
+          </div> */}
         </div>
-        <Drawer
-          title="Menu"
-          width={250}
-          placement="left"
-          open={openMenu}
-          onClose={() => setOpenmenu(false)}
-          closable={false}
-        >
-          {/* <Navbar isInline /> */}
-        </Drawer>
-        <hr />
-        {/* <div className="flex justify-between items-center p-4">
-          <DropDown
-            categoriesData={categoriesData}
-            className="w-1/4 md:w-1/6"
-          />
-          <div className="hidden md:block">
-            <Navbar />
-          </div>
-        </div> */}
       </div>
-    </div>
-  );
+    );
+  }
+
+  return null;
 };
 
 export default Navigation;

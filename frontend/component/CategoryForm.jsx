@@ -1,6 +1,6 @@
 import React from "react";
 import { UploadOutlined } from "@ant-design/icons";
-import { Button, message, Upload } from "antd";
+import { Button, Input, Upload } from "antd";
 
 const CategoryForm = ({
   value,
@@ -20,24 +20,27 @@ const CategoryForm = ({
   };
 
   return (
-    <div className="">
+    <div>
       <form onSubmit={handleSubmit} className="space-y-3">
-        <input
+        <Input
+          size="large"
           type="text"
-          className="py-3 px-4 border rounded-lg w-full"
+          className="py-2 px-4 rounded-lg  w-full "
           placeholder="Viết tên thể loại"
           value={value}
           onChange={(e) => setValue(e.target.value)}
+          disabled={isLoading}
         />
         <div className="pt-4">
           <Upload
             listType="picture"
             maxCount={1}
-            status="done"
             accept=".jpg,.jpeg,.png"
             onChange={handleImageUploadChange}
+            disabled={isLoading}
           >
             <Button
+              size="large"
               icon={<UploadOutlined />}
               loading={isLoading}
               aria-label="Chọn ảnh"
@@ -47,16 +50,24 @@ const CategoryForm = ({
           </Upload>
         </div>
         <div className="flex justify-between pt-4">
-          <Button type="primary" htmlType="submit" loading={isLoading}>
-            {isLoading ? "Đang " + buttonText + "..." : buttonText}
+          <Button
+            size="large"
+            type="primary"
+            htmlType="submit"
+            loading={isLoading}
+            disabled={isLoading}
+          >
+            {isLoading ? `Đang ${buttonText}...` : buttonText}
           </Button>
 
           {handleDelete && (
             <Button
+              size="large"
               loading={isLoading}
               danger
               onClick={handleDelete}
               aria-label="Xoá"
+              disabled={isLoading}
             >
               {isLoading ? "Đang Xoá..." : "Xoá"}
             </Button>

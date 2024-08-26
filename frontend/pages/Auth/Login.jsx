@@ -36,7 +36,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-[#F0F2F5] pt-10 ">
+    <div className="flex justify-center items-center min-h-screen bg-[#EDF2F9] pt-10 ">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
         <div className="flex justify-between items-center mb-4">
           <Link to="/">

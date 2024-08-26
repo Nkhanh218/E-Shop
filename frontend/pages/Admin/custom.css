@@ -1,0 +1,31 @@
+/* UserList.css */
+.custom-table {
+    border: 1px solid #e8e8e8;
+    border-radius: 24px;
+    overflow: hidden;
+  }
+  
+  .custom-table .ant-table-thead > tr > th {
+    background-color: #EDF2F9;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .custom-table .ant-table-tbody > tr > td {
+    text-align: center;
+        background-color: white;
+
+  }
+  
+  .custom-table .ant-table-tbody > tr:hover > td {
+    background-color: #f5f5f5;
+  }
+  
+  .custom-table .ant-table-tbody > tr > td:first-child {
+    font-weight: bold;
+  }
+  .ant-pagination {
+    margin:unset !important;
+    padding: 16px 0;
+    background-color: white;
+  }

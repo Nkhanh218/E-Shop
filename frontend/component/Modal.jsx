@@ -4,7 +4,7 @@ import { Modal } from "antd";
 const ModalCat = ({ isOpen, onClose, children }) => {
   return (
     <Modal
-      title="Category Details"
+      title="Cập nhật thể loại"
       open={isOpen}
       onCancel={onClose}
       footer={null}
