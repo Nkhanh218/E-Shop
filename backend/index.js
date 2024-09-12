@@ -9,6 +9,8 @@ import userRoutes from "./routes/userRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import bannerRoutes from "./routes/bannerRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
 import { v2 as cloudinary } from "cloudinary";
 
 dotenv.config();
@@ -27,6 +29,10 @@ app.use("/api/users", userRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/delete", uploadRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/banners", bannerRoutes);
+
 const port = process.env.PORT || 5000;
 
 app.listen(port, () => console.log(`Server running on port ${port}`));

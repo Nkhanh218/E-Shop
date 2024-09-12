@@ -13,7 +13,13 @@ const reviewSchema = mongoose.Schema(
   },
   { timestamps: true }
 );
-
+const variantSchema = mongoose.Schema({
+  color: { type: String, required: true },
+  storage: { type: String, required: false }, // e.g., 256GB, 512GB, 1TB
+  price: { type: Number, required: true },
+  discountPrice: { type: Number, required: false },
+  stock: { type: Number, required: true, default: 0 },
+});
 const productSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -21,16 +27,29 @@ const productSchema = mongoose.Schema(
       {
         public_id: { type: String },
         url: { type: String, required: true },
+        color: { type: String, required: false },
       },
     ],
-    quantity: { type: Number, required: true },
+    brand: { type: String, required: true },
+
     category: { type: ObjectId, ref: "Category", required: true },
     description: { type: String, required: true },
+    variants: [variantSchema],
     reviews: [reviewSchema],
     rating: { type: Number, required: true, default: 0 },
     numReviews: { type: Number, required: true, default: 0 },
-    price: { type: Number, required: true },
-    countInStock: { type: Number, required: true, default: 0 },
+
+    specifications: [
+      {
+        title: { type: String, required: true },
+        details: [
+          {
+            key: { type: String, required: true },
+            value: { type: String, required: true },
+          },
+        ],
+      },
+    ],
   },
   {
     timestamps: true,

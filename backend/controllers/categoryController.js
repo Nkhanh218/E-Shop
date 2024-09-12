@@ -33,7 +33,6 @@ const updateCategory = asyncHandler(async (req, res) => {
   try {
     const { name, image } = req.body;
     const { categoryId } = req.params;
-
     const category = await Category.findById(categoryId);
     if (!category) {
       return res.status(404).json({ error: "Không tìm thấy thể loại này" });
@@ -86,7 +85,8 @@ const removeCategory = asyncHandler(async (req, res) => {
     if (!category) {
       return res.status(404).json({ error: "Category not found" });
     }
-
+    console.log("category image:", category.image);
+    console.log("category imageid:", category.image.public_id);
     // Delete the image from Cloudinary
     if (category.image && category.image.public_id) {
       const result = await cloudinary.uploader.destroy(

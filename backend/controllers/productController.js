@@ -1,78 +1,265 @@
 import asyncHandler from "../middlewares/asyncHandler.js";
 import Product from "../models/productModel.js";
 import { extractPublicId } from "cloudinary-build-url";
+import { v2 as cloudinary } from "cloudinary";
 
 const addProduct = asyncHandler(async (req, res) => {
   try {
-    const { name, description, price, category, quantity, brand, image } =
-      req.fields;
-    switch (true) {
-      case !name:
-        return res.json({ error: "Name is required" });
-      case !brand:
-        return res.json({ error: "Brand is required" });
-      case !description:
-        return res.json({ error: "Description is required" });
-      case !category:
-        return res.json({ error: "Category is required" });
-      case !price:
-        return res.json({ error: "Price is required" });
-      case !quantity:
-        return res.json({ error: "Quantity is required" });
+    const {
+      name,
+      description,
+
+      category,
+      brand,
+    } = req.fields;
+
+    // Process images
+    const images = [];
+    for (let key in req.fields) {
+      if (key.startsWith("images[")) {
+        console.log("object", req.fields[key]);
+        const url = req.fields[key];
+        const color = req.fields[`image[${key.match(/\d+/)[0]}][color]`] || "";
+
+        const public_id = extractPublicId(url);
+        images.push({ public_id, url, color });
+      }
     }
-    const imageUrls = [];
+
+    // Process specifications
+    const specifications = [];
+    for (let key in req.fields) {
+      if (key.startsWith("specifications[")) {
+        const match = key.match(/\d+/);
+        if (match) {
+          const index = parseInt(match[0], 10);
+          const field = key.split("[")[2].split("]")[0]; // 'title', 'specs', or 'key'/'value'
+
+          if (!specifications[index]) {
+            specifications[index] = { title: "", details: [] };
+          }
+
+          if (field === "title") {
+            specifications[index].title = req.fields[key];
+          } else if (field === "specs") {
+            const specIndex = parseInt(key.split("[")[3].split("]")[0], 10);
+            if (!specifications[index].details[specIndex]) {
+              specifications[index].details[specIndex] = { key: "", value: "" };
+            }
+            const specField = key.split("[")[4].split("]")[0]; // 'key' or 'value'
+            specifications[index].details[specIndex][specField] =
+              req.fields[key];
+          }
+        }
+      }
+    }
+
+    // Filter and format specifications
+    const formattedSpecifications = specifications.filter(
+      (spec) => spec.title && spec.details.length > 0
+    );
+    // Process variants
+    const variants = [];
+    for (let key in req.fields) {
+      if (key.startsWith("variants[")) {
+        const match = key.match(/\d+/);
+        if (match) {
+          const index = parseInt(match[0], 10);
+          const field = key.split("[")[2].split("]")[0]; // 'size', 'color', 'price', etc.
+
+          if (!variants[index]) {
+            variants[index] = { size: "", color: "", price: 0 };
+          }
+
+          variants[index][field] = req.fields[key];
+        }
+      }
+    }
+    // Create and save product
+    const product = new Product({
+      name,
+      description,
+      specifications: formattedSpecifications,
+
+      category,
+      brand,
+      images,
+      variants,
+    });
+    console.log("product", product);
+    await product.save();
+    res.json(product);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+const updateProductDetails = asyncHandler(async (req, res) => {
+  try {
+    const {
+      name,
+      description,
+
+      category,
+      brand,
+    } = req.fields;
+
+    const deleteImages = [];
+    for (let key in req.fields) {
+      if (key.startsWith("deleteImages[")) {
+        deleteImages.push(req.fields[key]);
+      }
+    }
+    console.log(deleteImages);
+    if (deleteImages.length > 0) {
+      for (const imageUrl of deleteImages) {
+        // Assuming you have a utility function extractPublicId to get public_id from the URL
+        const publicId = extractPublicId(imageUrl);
+        await cloudinary.uploader.destroy(publicId);
+      }
+    }
+
+    // Validation
+    if (!name || !brand || !description || !category) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    // Process images
     const images = [];
     for (let key in req.fields) {
       if (key.startsWith("images[")) {
         const url = req.fields[key];
-
-        const public_id_full = extractPublicId(url);
-        const public_id = public_id_full.split("/").pop(); // Extract only the unique identifier
-        images.push({ public_id, url });
+        const color = req.fields[`image[${key.match(/\d+/)[0]}][color]`] || "";
+        const public_id = extractPublicId(url);
+        images.push({ public_id, url, color });
       }
     }
-    const product = new Product({
-      name,
-      description,
-      price,
-      category,
-      quantity,
-      brand,
 
-      images,
-    });
-    await product.save();
-    res.json(product);
-  } catch (error) {
-    console.error(error);
-    res.status(404).json(error.message);
-  }
-});
-const updateProductDetails = asyncHandler(async (req, res) => {
-  try {
-    const { name, description, price, category, quantity, brand } = req.fields;
+    // Process specifications
+    const specifications = [];
+    for (let key in req.fields) {
+      if (key.startsWith("specifications[")) {
+        const match = key.match(/\d+/);
+        if (match) {
+          const index = parseInt(match[0], 10);
+          const field = key.split("[")[2].split("]")[0];
 
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      { ...req.fields },
-      { new: true }
+          if (!specifications[index]) {
+            specifications[index] = { title: "", details: [] };
+          }
+
+          if (field === "title") {
+            specifications[index].title = req.fields[key];
+          } else if (field === "specs") {
+            const specIndex = parseInt(key.split("[")[3].split("]")[0], 10);
+            if (!specifications[index].details[specIndex]) {
+              specifications[index].details[specIndex] = { key: "", value: "" };
+            }
+            const specField = key.split("[")[4].split("]")[0];
+            specifications[index].details[specIndex][specField] =
+              req.fields[key];
+          }
+        }
+      }
+    }
+
+    // Filter and format specifications
+    const formattedSpecifications = specifications.filter(
+      (spec) => spec.title && spec.details.length > 0
     );
-    await product.save();
-    res.json(product);
+    // Process variants
+    const variants = [];
+    for (let key in req.fields) {
+      if (key.startsWith("variants[")) {
+        const match = key.match(/\d+/);
+        if (match) {
+          const index = parseInt(match[0], 10);
+          const field = key.split("[")[2].split("]")[0];
+
+          if (!variants[index]) {
+            variants[index] = {
+              color: "",
+              storage: "",
+              price: 0,
+              discountPrice: 0,
+              stock: 0,
+            };
+          }
+
+          variants[index][field] = req.fields[key];
+        }
+      }
+    }
+    console.log("object", variants);
+    // Update product details
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        name,
+        description,
+        category,
+        brand,
+        images,
+        specifications: formattedSpecifications,
+        variants,
+      },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    res.json(updatedProduct);
   } catch (error) {
-    console.error(error);
-    res.status(400).json(error.message);
+    res.status(500).json({ error: error.message });
   }
 });
+
 const removeProduct = asyncHandler(async (req, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
-    res.json(product);
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const imageDeletions = product.images.map(async (image) => {
+      if (image && image.public_id) {
+        try {
+          console.log(
+            "Attempting to delete image with public_id:",
+            image.public_id
+          );
+          const result = await cloudinary.uploader.destroy(image.public_id);
+          if (result.result === "not found") {
+            console.warn(
+              `Image with public_id: ${image.public_id} was not found on Cloudinary.`
+            );
+          } else {
+            console.log("Cloudinary deletion result:", result);
+          }
+        } catch (cloudinaryError) {
+          console.error(
+            "Error deleting image from Cloudinary:",
+            cloudinaryError
+          );
+        }
+      }
+    });
+
+    await Promise.all(imageDeletions);
+
+    await Product.findByIdAndDelete(req.params.id);
+
+    res.json({ message: "Product removed" });
   } catch (error) {
-    console.error(error);
-    res.status(500).json(error.message);
+    console.error("Error removing product:", error);
+    res.status(500).json({ message: error.message });
   }
 });
+
 const fetchProducts = asyncHandler(async (req, res) => {
   try {
     const pageSize = 6;
