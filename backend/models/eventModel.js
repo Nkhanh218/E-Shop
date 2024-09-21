@@ -26,9 +26,14 @@ const productSchema = new mongoose.Schema({
     ref: "Product",
     required: true,
   },
-  maxQuantityPerCustomer: {
+  maxTotalQuantity: {
     type: Number,
-    required: false,
+    required: true,
+    default: 0,
+  },
+  soldQuantity: {
+    type: Number,
+    default: 0,
   },
   variants: [variantSchema],
 });

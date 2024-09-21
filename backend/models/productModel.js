@@ -28,6 +28,7 @@ const productSchema = mongoose.Schema(
         public_id: { type: String },
         url: { type: String, required: true },
         color: { type: String, required: false },
+        featuredImage: { type: Boolean, required: false, default: false },
       },
     ],
     brand: { type: String, required: true },

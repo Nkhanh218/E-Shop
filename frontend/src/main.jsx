@@ -8,7 +8,7 @@ import { Provider } from "react-redux";
 import store from "./redux/store.js";
 import Login from "./pages/Auth/Login.jsx";
 import Register from "./pages/Auth/Register.jsx";
-import Profile from "./pages/User/Profile.jsx";
+// import Profile from "./pages/User/Profile.jsx";
 import PrivateRouter from "./component/PrivateRouter.jsx";
 import AdminRoute from "./pages/Admin/AdminRoute.jsx";
 import UserList from "./pages/Admin/UserList.jsx";
@@ -20,16 +20,18 @@ import BannerManagement from "./pages/Admin/BannerManagement.jsx";
 import EventManagement from "./pages/Admin/EventManagement.jsx";
 
 import Home from "./pages/Home.jsx";
+import ProductDetails from "./pages/Products/ProductDetails.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
       <Route path="" element={<PrivateRouter />}>
-        <Route path="/ho-So" element={<Profile />} />
+        {/* <Route path="/ho-So" element={<Profile />} /> */}
       </Route>
       <Route path="/dang-nhap" element={<Login />} />
       <Route path="/dang-ky" element={<Register />} />
       <Route index={true} path="/" element={<Home />} />
+      <Route path="/san-pham/:productName" element={<ProductDetails />} />
       {/* Admin Route */}
 
       <Route path="/admin" element={<AdminRoute />}>

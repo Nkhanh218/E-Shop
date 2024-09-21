@@ -96,7 +96,12 @@ const ProductList = () => {
 
   const copyVariant = (index) => {
     const variantToCopy = variants[index];
-    setVariants([...variants, { ...variantToCopy }]);
+    console.log("Copying variant:", variantToCopy);
+    setVariants((prevVariants) => {
+      const newVariants = [...prevVariants, { ...variantToCopy }]; // Sao chép đúng thuộc tính
+      console.log("Updated variants:", newVariants);
+      return newVariants;
+    });
   };
 
   const handleSubmit = async (values) => {
@@ -279,10 +284,12 @@ const ProductList = () => {
                           rules={[
                             {
                               required: true,
+                              message: "Vui lòng nhập tên màu",
                             },
                           ]}
                         >
                           <Input
+                            required={true}
                             size="large"
                             value={variant.color}
                             onChange={(e) =>
@@ -317,7 +324,15 @@ const ProductList = () => {
                     </Row>
                     <Row gutter={16}>
                       <Col span={12}>
-                        <Form.Item label="Giá gốc">
+                        <Form.Item
+                          label="Giá gốc"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng nhập giá gốc",
+                            },
+                          ]}
+                        >
                           <Input
                             required={true}
                             size="large"
@@ -354,8 +369,17 @@ const ProductList = () => {
                         </Form.Item>
                       </Col>
                     </Row>
-                    <Form.Item label="Số lượng">
+                    <Form.Item
+                      label="Số lượng"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Vui lòng nhập số lượng",
+                        },
+                      ]}
+                    >
                       <Input
+                        required={true}
                         size="large"
                         type="number"
                         value={variant.stock}
@@ -500,7 +524,7 @@ const ProductList = () => {
                   {specifications.map((section, sectionIndex) => (
                     <div key={sectionIndex} className="mb-6 p-6">
                       <Input
-                        // required={true}
+                        required={true}
                         placeholder="Tiêu đề"
                         value={section.title}
                         onChange={(e) =>

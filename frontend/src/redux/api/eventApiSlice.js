@@ -6,6 +6,10 @@ export const eventApiSlice = apiSlice.injectEndpoints({
     getEvents: builder.query({
       query: () => `${EVENT_URL}`, // Đảm bảo URL đúng
     }),
+    getAllEvents: builder.query({
+      query: () => `${EVENT_URL}/`,
+      providesTags: ["Event"],
+    }),
     getEventById: builder.query({
       query: (id) => `${EVENT_URL}/${id}`,
     }),
@@ -48,6 +52,7 @@ export const eventApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useGetEventsQuery,
+  useGetAllEventsQuery,
   useGetEventByIdQuery,
   useUploadEventImageMutation,
   useDeleteimageclouldMutation,

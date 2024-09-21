@@ -9,9 +9,10 @@
     
 }
 .slick-prev {
-
+top:80px
 }
 
 .slick-next {
     right: 5px; 
+    top:80px
 }

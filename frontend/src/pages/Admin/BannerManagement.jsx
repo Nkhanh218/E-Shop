@@ -11,7 +11,7 @@ import {
 import axios from "axios";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import "./BannerManagement.css";
+import styles from "./BannerManagement.module.css";
 import { useOutletContext } from "react-router-dom";
 
 const BannerManagement = () => {
@@ -24,7 +24,7 @@ const BannerManagement = () => {
     mainBanner: { public_id: "", url: "" },
     smallSlider: Array(6).fill({ public_id: "", url: "" }),
     smallBanner: { public_id: "", url: "" },
-    visible: false, // Add this line
+    visible: false,
   });
 
   const [selectedFiles, setSelectedFiles] = useState({
@@ -65,7 +65,7 @@ const BannerManagement = () => {
       });
 
       if (data && data.images && data.images.length > 0) {
-        const publicIdString = data.images[0].public_id.join("/"); // Join with '/'
+        const publicIdString = data.images[0].public_id.join("/");
         return {
           public_id: publicIdString,
           url: data.images[0].url,
@@ -75,14 +75,13 @@ const BannerManagement = () => {
       console.error("Error uploading file:", error);
     }
 
-    return { public_id: "", url: "" }; // Default return value if upload fails
+    return { public_id: "", url: "" };
   };
 
   const handleSubmit = async (e) => {
     setLoading(true);
 
     try {
-      // Upload all selected files
       const uploadedImages = await Promise.all([
         uploadFile(selectedFiles.mainBanner, "mainBanner"),
         ...selectedFiles.smallSlider.map((file) =>
@@ -91,25 +90,22 @@ const BannerManagement = () => {
         uploadFile(selectedFiles.smallBanner, "smallBanner"),
       ]);
 
-      // Update newBanner state with uploaded image URLs
       const updatedBanner = {
         mainBanner: uploadedImages[0] || { public_id: "", url: "" },
         smallSlider: uploadedImages
           .slice(1, 7)
           .map((img) => img || { public_id: "", url: "" }),
         smallBanner: uploadedImages[7] || { public_id: "", url: "" },
-        visible: newBanner.visible, // Add this line
+        visible: newBanner.visible,
       };
 
-      // Create banner with uploaded images
       await createBanner(updatedBanner);
 
-      // Reset states
       setNewBanner({
         mainBanner: { public_id: "", url: "" },
         smallSlider: Array(6).fill({ public_id: "", url: "" }),
         smallBanner: { public_id: "", url: "" },
-        visible: false, // Add this line
+        visible: false,
       });
       setSelectedFiles({
         mainBanner: null,
@@ -119,7 +115,6 @@ const BannerManagement = () => {
       refetch();
     } catch (error) {
       console.error("Error uploading images:", error);
-      // Handle error (e.g., show error message to user)
     } finally {
       setLoading(false);
     }
@@ -144,13 +139,14 @@ const BannerManagement = () => {
     }
   };
 
-  // Slick settings for carousel
   const slickSettings = {
     dots: false,
     infinite: true,
     speed: 500,
-    slidesToShow: 2, // Show 2 images per slide
+    slidesToShow: 2,
     slidesToScroll: 2,
+    prevArrow: <div className={styles["slick-prev"]} />, // Apply the scoped class
+    nextArrow: <div className={styles["slick-next"]} />,
   };
 
   return (

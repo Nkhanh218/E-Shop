@@ -97,13 +97,7 @@ const addProduct = asyncHandler(async (req, res) => {
 
 const updateProductDetails = asyncHandler(async (req, res) => {
   try {
-    const {
-      name,
-      description,
-
-      category,
-      brand,
-    } = req.fields;
+    const { name, description, category, brand } = req.fields;
 
     const deleteImages = [];
     for (let key in req.fields) {
@@ -131,8 +125,12 @@ const updateProductDetails = asyncHandler(async (req, res) => {
       if (key.startsWith("images[")) {
         const url = req.fields[key];
         const color = req.fields[`image[${key.match(/\d+/)[0]}][color]`] || "";
+        const featuredImage =
+          req.fields[`imageft[${key.match(/\d+/)[0]}][featured]`] === "true";
+        console.log("featured", featuredImage);
         const public_id = extractPublicId(url);
-        images.push({ public_id, url, color });
+        images.push({ public_id, url, color, featuredImage });
+        console.log("images", images);
       }
     }
 
@@ -191,7 +189,6 @@ const updateProductDetails = asyncHandler(async (req, res) => {
         }
       }
     }
-    console.log("object", variants);
     // Update product details
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
@@ -281,9 +278,23 @@ const fetchProducts = asyncHandler(async (req, res) => {
 });
 const fetchProductById = asyncHandler(async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req?.params?.id);
     if (product) {
       return res.json(product);
+    } else {
+      res.status(404);
+      throw new Error("Product not found");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(404).json({ error: "Product not found" });
+  }
+});
+const fetchProductBySlug = asyncHandler(async (req, res) => {
+  try {
+    const product = await Product.findOne({ slug: req?.params?.slug });
+    if (product) {
+      res.json(product);
     } else {
       res.status(404);
       throw new Error("Product not found");
@@ -298,7 +309,7 @@ const fetchAllProducts = asyncHandler(async (req, res) => {
     const product = await Product.find({})
       .populate("category")
       .populate("category")
-      .limit(12)
+      // .limit(12)
       .sort({ createAt: -1 });
     res.json(product);
   } catch (error) {
@@ -364,6 +375,7 @@ export {
   removeProduct,
   fetchProducts,
   fetchProductById,
+  fetchProductBySlug,
   fetchAllProducts,
   addProductReview,
   fetchTopProducts,

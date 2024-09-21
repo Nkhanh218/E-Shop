@@ -107,7 +107,9 @@ const removeCategory = asyncHandler(async (req, res) => {
 
 const listCategory = asyncHandler(async (req, res) => {
   try {
-    const all = await Category.find({});
+    const limit = parseInt(req.query.limit) || 0;
+
+    const all = await Category.find({}).limit(limit);
     res.json(all);
   } catch (error) {
     console.log(error);

@@ -1,0 +1,15 @@
+.image-gallery-svg {
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  .image-gallery-image{
+    height: 400px !important; /* Đặt chiều cao cho ảnh */
+    object-fit: cover; /* Đảm bảo ảnh được cắt đúng tỷ lệ */
+  }
+  .image-gallery-thumbnail-image{
+width: 60px !important; 
+  }
+  .image-gallery-thumbnail{
+    width: 60px !important; 
+  }

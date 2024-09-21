@@ -10,10 +10,11 @@ import {
   Image,
   Card,
   Divider,
+  Checkbox,
 } from "antd";
 import { debounce } from "lodash";
 
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, StarOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
@@ -26,6 +27,7 @@ import {
   useUploadProductImageMutation,
 } from "../../redux/api/productApiSlice";
 import { useFetchCategoriesQuery } from "../../redux/api/categoryApiSlice";
+import { set } from "mongoose";
 
 const ProductUpdate = () => {
   const params = useParams();
@@ -34,10 +36,10 @@ const ProductUpdate = () => {
     isLoading,
     refetch,
   } = useGetProductByIdQuery(params._id);
-  const [form] = Form.useForm(); // Initialize the form instance
+  const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [imageColors, setImageColors] = useState({});
-
+  const [loading, setLoading] = useState(false);
   const [specifications, setSpecifications] = useState([]);
   const navigate = useNavigate();
   const { data: categories = [] } = useFetchCategoriesQuery();
@@ -45,6 +47,8 @@ const ProductUpdate = () => {
   const { setHeaderTitle } = useOutletContext();
   const [uploadProductImage] = useUploadProductImageMutation();
   const [deleteImages, setDeleteImages] = useState([]);
+  const [featuredImages, setFeaturedImages] = useState([]);
+
   const [variants, setVariants] = useState([
     { color: "", storage: "", price: 0, discountPrice: 0, stock: 0 },
   ]);
@@ -56,11 +60,10 @@ const ProductUpdate = () => {
   );
   useEffect(() => {
     if (productData && productData._id) {
-      // Populate form fields with fetched data
       setSpecifications(
         productData.specifications.map((section) => ({
           title: section.title || "",
-          specs: section.details || [], // Ensure correct mapping here
+          specs: section.details || [],
         }))
       );
       setFileList(
@@ -85,6 +88,11 @@ const ProductUpdate = () => {
           discountPrice: variant.discountPrice || 0,
           stock: variant.stock || 0,
         }))
+      );
+      setFeaturedImages(
+        productData.images
+          .filter((image) => image.featuredImage)
+          .map((image) => image.public_id)
       );
     }
   }, [productData]);
@@ -143,9 +151,15 @@ const ProductUpdate = () => {
       { ...prevVariants[index] },
     ]);
   }, []);
+  const toggleFeaturedImage = (uid) => {
+    setFeaturedImages((prev) =>
+      prev.includes(uid) ? prev.filter((id) => id !== uid) : [...prev, uid]
+    );
+  };
 
   const handleSubmit = useCallback(
     async (values) => {
+      setLoading(true);
       try {
         let uploadedImages = [];
         const existingImages = [];
@@ -171,8 +185,11 @@ const ProductUpdate = () => {
 
         allImages.forEach((url, index) => {
           const color = imageColors[fileList[index].uid] || "";
+          const featured = featuredImages.includes(fileList[index].uid);
+
           formData.append(`images[${index}]`, url);
           formData.append(`image[${index}][color]`, color);
+          formData.append(`imageft[${index}][featured]`, featured);
         });
 
         deleteImages.forEach((url, index) => {
@@ -218,8 +235,11 @@ const ProductUpdate = () => {
       } catch (error) {
         console.error("Update product failed:", error);
         toast.error("Cập nhật sản phẩm thất bại!");
+      } finally {
+        setLoading(false); // Kết thúc quá trình cập nhật, đặt loading thành false
       }
     },
+
     [
       fileList,
       imageColors,
@@ -230,6 +250,7 @@ const ProductUpdate = () => {
       params._id,
       refetch,
       uploadImageToServer,
+      featuredImages,
     ]
   );
 
@@ -312,6 +333,7 @@ const ProductUpdate = () => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
   return (
     <div className="flex justify-center items-center">
       <div className="bg-white p-8 m-8 rounded-3xl shadow-md w-full max-w-6xl">
@@ -324,7 +346,7 @@ const ProductUpdate = () => {
             multiple
             className="w-full md:w-2/3 bg-white p-4 rounded-lg shadow-md"
           >
-            {fileList.length >= 12 ? null : (
+            {fileList.length >= 30 ? null : (
               <div className="flex flex-col items-center justify-center">
                 <PlusOutlined />
                 <div className="mt-2">Tải hình ảnh sản phẩm</div>
@@ -336,7 +358,11 @@ const ProductUpdate = () => {
               <Row key={file.uid} gutter={16} className="mb-5" align="middle">
                 <Col>
                   <Image
-                    src={file.url || URL.createObjectURL(file.originFileObj)}
+                    src={
+                      file.url ||
+                      (file.originFileObj &&
+                        URL.createObjectURL(file.originFileObj))
+                    }
                     style={{ width: "50px", height: "auto" }} // Adjust width here
                     preview={true}
                   />
@@ -352,6 +378,14 @@ const ProductUpdate = () => {
                     placeholder="Nhập tên màu"
                     style={{ width: "150px" }} // Set a specific width here
                   />
+                </Col>
+                <Col>
+                  <Checkbox
+                    checked={featuredImages.includes(file.uid)}
+                    onChange={() => toggleFeaturedImage(file.uid)}
+                  >
+                    Ảnh nổi bật
+                  </Checkbox>
                 </Col>
               </Row>
             ))}
@@ -644,6 +678,7 @@ const ProductUpdate = () => {
                   type="primary"
                   htmlType="submit"
                   size="large"
+                  disabled={loading}
                   className="w-full"
                 >
                   Cập nhật sản phẩm

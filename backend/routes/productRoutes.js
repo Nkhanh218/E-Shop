@@ -11,6 +11,7 @@ import {
   addProductReview,
   fetchTopProducts,
   fetchNewProducts,
+  fetchProductBySlug,
 } from "../controllers/productController.js";
 import {
   authenticate,

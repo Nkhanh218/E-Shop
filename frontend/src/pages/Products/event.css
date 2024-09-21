@@ -1,0 +1,18 @@
+.slick-prev:before, .slick-next:before {
+    font-size: 50px; 
+    color: rgba(255, 255, 255, 1); 
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.slick-prev, .slick-next {
+    z-index: 10; 
+    
+}
+.slick-prev {
+
+}
+
+.slick-next {
+    right: 5px; 
+
+}

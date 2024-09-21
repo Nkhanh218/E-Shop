@@ -27,7 +27,12 @@ export const categoryApiSlice = apiSlice.injectEndpoints({
     }),
 
     fetchCategories: builder.query({
-      query: () => `${CATEGORY_URL}/categories`,
+      query: (limit) => {
+        const url = limit
+          ? `${CATEGORY_URL}/categories?limit=${limit}`
+          : `${CATEGORY_URL}/categories`;
+        return url;
+      },
     }),
   }),
 });
